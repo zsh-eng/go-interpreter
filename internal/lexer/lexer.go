@@ -36,9 +36,29 @@ func (l *Lexer) NextToken() token.Token {
 
 	switch l.ch {
 	case '=':
-		tok = newToken(token.ASSIGN, l.ch)
+		if l.peekChar() == '=' {
+			tok = l.newTwoCharToken(token.EQ, l.ch) // ==
+		} else {
+			tok = newToken(token.ASSIGN, l.ch) // =
+		}
 	case '+':
 		tok = newToken(token.PLUS, l.ch)
+	case '-':
+		tok = newToken(token.MINUS, l.ch)
+	case '!':
+		if l.peekChar() == '=' {
+			tok = l.newTwoCharToken(token.NOT_EQ, l.ch) // !=
+		} else {
+			tok = newToken(token.BANG, l.ch) // !
+		}
+	case '/':
+		tok = newToken(token.SLASH, l.ch)
+	case '*':
+		tok = newToken(token.ASTERISK, l.ch)
+	case '<':
+		tok = newToken(token.LT, l.ch)
+	case '>':
+		tok = newToken(token.GT, l.ch)
 	case ';':
 		tok = newToken(token.SEMICOLON, l.ch)
 	case '(':
@@ -108,4 +128,19 @@ func (l *Lexer) readNumber() string {
 
 func isDigit(ch byte) bool {
 	return '0' <= ch && ch <= '9'
+}
+
+// Peek at the next character without advancing the lexer
+func (l *Lexer) peekChar() byte {
+	if l.readPosition >= len(l.input) {
+		return NULL_ASCII
+	} else {
+		return l.input[l.readPosition]
+	}
+}
+
+// New token for two character tokens
+func (l *Lexer) newTwoCharToken(tokenType token.TokenType, char byte) token.Token {
+	l.readChar()
+	return token.Token{Type: tokenType, Literal: string(char) + string(l.ch)}
 }
