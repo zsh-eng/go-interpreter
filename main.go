@@ -1,7 +1,19 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+	"os/user"
+
+	"github.com/zsh-eng/go-interpreter/internal/repl"
+)
 
 func main() {
-	fmt.Println("hello, go!")
+	user, err := user.Current()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Hello %s! This is the Monkey programming language!\n", user.Username)
+	fmt.Println("Feel free to type in commands")
+	repl.Start(os.Stdin, os.Stdout)
 }
